@@ -1,70 +1,488 @@
-<!doctype html>
-<html lang="zh-CN">
-
+<!DOCTYPE html>
+<html lang="zh-CN" data-theme="day">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Zero to Tech · 个人主页</title>
-  <link rel="stylesheet" href="css/reset.css" />
-  <link rel="stylesheet" href="css/variables.css" />
-  <link rel="stylesheet" href="css/layout.css" />
-  <link rel="stylesheet" href="css/hero.css" />
-  <link rel="stylesheet" href="css/nav.css" />
-  <link rel="stylesheet" href="css/cards.css" />
-  <link rel="stylesheet" href="css/lab.css" />
-  <link rel="stylesheet" href="css/responsive.css" />
+  <title>妈妈，我爱你 · 写给我最爱的你</title>
+  <meta name="description" content="一份献给妈妈的网页：赞美她的好，记录我们的时光，写一封说不出口的信。" />
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>&#128149;</text></svg>" />
+  <link rel="stylesheet" href="css/style.css" />
 </head>
-
 <body>
-  <div class="app-shell">
-    <div class="page-shell">
-      <main class="page-content">
-        <section class="dashboard-grid">
 
-          <!-- ↓↓↓ 顶部 hero：品牌 + 导航 + 大标题 + 副标题 ↓↓↓ -->
-          <!-- 这一整块在 text-lab.html 里几乎一字不差地又抄了一遍 -->
-          <article class="hero-stage panel-full">
-            <div class="hero-topline">
-              <p class="brand-eyebrow">zero to tech</p>
-              <nav class="inline-links hero-nav">
-                <a class="nav-link" href="index.html">个人主页</a>
-                <a class="nav-link" href="text-lab.html">文字实验室</a>
-              </nav>
-            </div>
-            <div class="hero-copy">
-              <h1 class="hero-display">关于我</h1>
-              <p class="hero-subtitle">项目，创意，灵感，心得，我的作品</p>
-            </div>
+  <!-- ============================================================
+       ✏️  想改成你自己的信息，只改下面这一段就够了
+       ============================================================ -->
+  <script>
+    window.MOM_CONFIG = {
+      momName: "妈妈",              // 想怎么称呼她，比如 "妈妈" / "老妈" / 她的名字
+      since: "1998-06-18",         // 你出生的那一天（用来计算你们相伴了多久）
+      signature: "爱你的孩子"       // 信末署名
+    };
+
+    /* 在页面渲染之前就把上次选的主题恢复好，避免开页面时闪一下 */
+    (function () {
+      try {
+        var t = JSON.parse(localStorage.getItem('mom.theme'));
+        if (t === 'night' || t === 'day') {
+          document.documentElement.setAttribute('data-theme', t);
+        }
+      } catch (e) { /* 隐私模式下忽略 */ }
+    })();
+  </script>
+
+  <!-- 飘落的花瓣（背景） -->
+  <canvas id="petalCanvas" class="petal-canvas" aria-hidden="true"></canvas>
+
+  <!-- 滚动进度 -->
+  <div class="scroll-progress" id="scrollProgress" aria-hidden="true"></div>
+
+  <!-- ============ 顶部导航 ============ -->
+  <header class="site-header" id="siteHeader">
+    <div class="container header-inner">
+      <a href="#hero" class="logo">
+        <span class="logo-mark">💗</span>
+        <span class="logo-text">妈妈，我爱你</span>
+      </a>
+
+      <nav class="nav" id="mainNav" aria-label="主导航">
+        <a href="#praises" class="nav-link">她的好</a>
+        <a href="#gallery" class="nav-link">时光相册</a>
+        <a href="#memories" class="nav-link">我们的时光</a>
+        <a href="#lessons" class="nav-link">你教我的事</a>
+        <a href="#letter" class="nav-link">一封信</a>
+        <a href="#compliment" class="nav-link">夸夸她</a>
+        <a href="#promises" class="nav-link">我的承诺</a>
+      </nav>
+
+      <div class="header-actions">
+        <button class="icon-btn" id="musicToggle" type="button" title="播放音乐盒" aria-label="播放音乐盒" aria-pressed="false">
+          <span class="music-icon">🎵</span>
+        </button>
+        <button class="icon-btn" id="themeToggle" type="button" title="切换日间／夜间" aria-label="切换日间／夜间">
+          <span class="theme-icon sun">☀️</span>
+          <span class="theme-icon moon">🌙</span>
+        </button>
+        <button class="hamburger" id="hamburger" type="button" aria-label="打开菜单" aria-expanded="false">
+          <span></span><span></span><span></span>
+        </button>
+      </div>
+    </div>
+  </header>
+
+  <main>
+    <!-- ============ 首屏 ============ -->
+    <section class="hero" id="hero">
+      <div class="hero-glow" aria-hidden="true"></div>
+
+      <div class="container hero-inner">
+        <p class="eyebrow reveal">To the best mom in the world</p>
+        <h1 class="reveal">
+          你是我见过的<br />
+          <span class="ink">最温柔，也最勇敢</span>的人
+        </h1>
+        <p class="hero-sub reveal">
+          这句话我大概从来没有当面说过。<br />
+          所以我把它们写在这里——写给你，我最爱的妈妈。
+        </p>
+
+        <div class="hero-btns reveal">
+          <a href="#letter" class="btn btn-primary">💌 读一读那封信</a>
+          <a href="#compliment" class="btn btn-ghost">🌸 夸夸妈妈</a>
+        </div>
+
+        <!-- 相伴计时 -->
+        <div class="together reveal">
+          <p class="together-label">
+            从你成为妈妈的那天起 <span class="together-since" id="sinceLabel">—</span>
+          </p>
+          <div class="together-grid">
+            <div class="together-item"><b id="tDays">0</b><span>天</span></div>
+            <div class="together-item"><b id="tHours">0</b><span>小时</span></div>
+            <div class="together-item"><b id="tMins">0</b><span>分钟</span></div>
+            <div class="together-item"><b id="tSecs">0</b><span>秒</span></div>
+          </div>
+          <p class="together-note">这些数字还在长大，就像你对我的好，从来没停过。</p>
+        </div>
+      </div>
+
+      <a href="#praises" class="scroll-hint" aria-label="向下滚动">
+        <span class="mouse"><span class="wheel"></span></span>
+      </a>
+    </section>
+
+    <!-- ============ 她的好 ============ -->
+    <section class="section" id="praises">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Her Goodness</p>
+          <h2>关于你的好，我可以讲很久</h2>
+          <p class="section-sub">挑出八件，却远远不止八件。</p>
+        </header>
+
+        <div class="praise-grid">
+          <article class="praise-card reveal">
+            <div class="praise-icon">🌷</div>
+            <h3>温柔</h3>
+            <p>你的声音有一种魔力。再糟糕的一天，只要听到你喊我的名字，我的心就安静下来了。</p>
           </article>
-          <!-- ↑↑↑ hero 结束 ↑↑↑ -->
 
-          <article class="panel panel-full featured-work-panel card">
-            <p class="section-kicker">作品</p>
-            <p class="featured-title">文字实验室</p>
-            <p class="featured-copy">拼音和情绪，挖掘中文里的细节</p>
-            <a class="featured-link" href="text-lab.html">
-              <span class="featured-link-label">打开作品</span>
-              <span class="arrow">›</span>
-            </a>
+          <article class="praise-card reveal">
+            <div class="praise-icon">🛡️</div>
+            <h3>坚强</h3>
+            <p>你从不在我面前掉眼泪。长大以后我才明白——不是你不累，是你替我扛住了。</p>
           </article>
 
-          <article class="panel panel-full identity-panel card">
-            <div class="identity-item">
-              <p class="section-kicker">座右铭</p>
-              <p class="identity-value identity-quote">已识乾坤大，尤怜草木青</p>
-            </div>
-            <div class="identity-item">
-              <p class="section-kicker">正在学习</p>
-              <p class="identity-value">零到全栈</p>
-            </div>
+          <article class="praise-card reveal">
+            <div class="praise-icon">🕯️</div>
+            <h3>耐心</h3>
+            <p>同一句话你教了我一百遍，第一百零一遍的时候，你还是笑着的。</p>
           </article>
 
-        </section>
-      </main>
+          <article class="praise-card reveal">
+            <div class="praise-icon">🍚</div>
+            <h3>无私</h3>
+            <p>最好吃的那块肉永远在我的碗里。你说你不爱吃——这句话我信了太多年。</p>
+          </article>
+
+          <article class="praise-card reveal">
+            <div class="praise-icon">🌈</div>
+            <h3>乐观</h3>
+            <p>你说「没事，天塌下来有妈」。于是我的天，从来就没有塌过。</p>
+          </article>
+
+          <article class="praise-card reveal">
+            <div class="praise-icon">🎀</div>
+            <h3>细致</h3>
+            <p>我随口提过一句想吃什么，第二天它就出现在饭桌上。你把我每句闲话都当了真。</p>
+          </article>
+
+          <article class="praise-card reveal">
+            <div class="praise-icon">🔥</div>
+            <h3>勇敢</h3>
+            <p>你怕黑、怕打针、怕虫子，却敢为了我跟整个世界较劲。这才是真正的勇敢。</p>
+          </article>
+
+          <article class="praise-card reveal">
+            <div class="praise-icon">🕊️</div>
+            <h3>善良</h3>
+            <p>你把善意分给所有人，连不值得的人都分。你的这一半，我学了很久还没学全。</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 时光相册 ============ -->
+    <section class="section section-alt" id="gallery">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Our Album</p>
+          <h2>时光相册</h2>
+          <p class="section-sub">
+            点击任意一张可以放大。<br />
+            <span class="tiny-hint">（把照片放进 images 文件夹，替换掉下面的占位，就能换成你们真正的合影）</span>
+          </p>
+        </header>
+
+        <div class="gallery">
+          <!-- ✏️ 想换成真实照片：把 <figure class="photo"> 里的 <div class="photo-art"> 换成
+               <img src="images/你的照片.jpg" alt="说明" /> 即可 -->
+          <figure class="photo ph-1 reveal" data-caption="你抱着我的第一张照片 —— 你眼里的光，比镜头还亮。">
+            <div class="photo-art">👶</div>
+            <figcaption>你抱着我的第一张照片</figcaption>
+          </figure>
+
+          <figure class="photo ph-2 reveal" data-caption="学走路那天 —— 你松开了手，却一直没走远。">
+            <div class="photo-art">👣</div>
+            <figcaption>学走路那天</figcaption>
+          </figure>
+
+          <figure class="photo ph-3 reveal" data-caption="上学的第一天 —— 书包比我还大，你的手一直搭在我肩上。">
+            <div class="photo-art">🎒</div>
+            <figcaption>上学的第一天</figcaption>
+          </figure>
+
+          <figure class="photo ph-4 reveal" data-caption="我发烧那一晚 —— 你一夜没睡，我醒来时你还坐在床边。">
+            <div class="photo-art">🌡️</div>
+            <figcaption>我发烧那一晚</figcaption>
+          </figure>
+
+          <figure class="photo ph-5 reveal" data-caption="我离家那天 —— 你站在门口笑着挥手，转身就哭了。">
+            <div class="photo-art">🧳</div>
+            <figcaption>我离家那天</figcaption>
+          </figure>
+
+          <figure class="photo ph-6 reveal" data-caption="现在的我们 —— 我长高了，你变矮了。换我来护着你。">
+            <div class="photo-art">🤗</div>
+            <figcaption>现在的我们</figcaption>
+          </figure>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 我们的时光 ============ -->
+    <section class="section" id="memories">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Our Days</p>
+          <h2>我们的时光</h2>
+          <p class="section-sub">有些日子当时很普通，回头看才发现，全是你在撑着。</p>
+        </header>
+
+        <ol class="timeline">
+          <li class="timeline-item reveal">
+            <span class="timeline-dot">💗</span>
+            <div class="timeline-body">
+              <h3>那一年，你成为了妈妈</h3>
+              <p>你也曾是个爱漂亮、会撒娇的女孩。后来你把裙子和心事都收了起来，换成了奶瓶、尿布和一夜一夜的睡眠不足。</p>
+            </div>
+          </li>
+
+          <li class="timeline-item reveal">
+            <span class="timeline-dot">🌱</span>
+            <div class="timeline-body">
+              <h3>我上学的那些年</h3>
+              <p>天没亮你就起来做早饭，冬天的门口总有你搓着手等我的身影。你从没说过辛苦，只说「快进去，别迟到」。</p>
+            </div>
+          </li>
+
+          <li class="timeline-item reveal">
+            <span class="timeline-dot">📚</span>
+            <div class="timeline-body">
+              <h3>我熬夜写作业，你就熬夜陪着我</h3>
+              <p>你不会做那些题，但你会在旁边坐着，悄悄把热牛奶换成温的，怕烫着我。你陪的不是作业，是我的整个少年时代。</p>
+            </div>
+          </li>
+
+          <li class="timeline-item reveal">
+            <span class="timeline-dot">💪</span>
+            <div class="timeline-body">
+              <h3>我第一次受挫，你说「妈在呢」</h3>
+              <p>那三个字，比任何大道理都有用。后来我在外面撑过很多难熬的时刻，靠的都是这句话。</p>
+            </div>
+          </li>
+
+          <li class="timeline-item reveal">
+            <span class="timeline-dot">✈️</span>
+            <div class="timeline-body">
+              <h3>我离开家以后，你学会了用手机</h3>
+              <p>你戴上老花镜，把每个步骤记在纸上，只为了能给我发一句「吃饭了吗」。你打字很慢，可你的牵挂一点都不慢。</p>
+            </div>
+          </li>
+
+          <li class="timeline-item reveal">
+            <span class="timeline-dot">🤗</span>
+            <div class="timeline-body">
+              <h3>现在，换我护着你</h3>
+              <p>你开始说「这个我不会」，开始让我帮你做决定。我知道，那个无所不能的妈妈，终于肯在我面前示弱了——这是我长大的证据，也是我最心疼的时刻。</p>
+            </div>
+          </li>
+        </ol>
+      </div>
+    </section>
+
+    <!-- ============ 你教我的事 ============ -->
+    <section class="section section-alt" id="lessons">
+      <div class="container lessons-layout">
+        <div class="lessons-main reveal">
+          <p class="eyebrow">What You Taught Me</p>
+          <h2>你教会我的事</h2>
+          <p class="section-sub">你没有读过育儿书，可你教给我的每一条，都是真理。</p>
+
+          <ul class="lesson-list">
+            <li>
+              <b>饭要好好吃，觉要好好睡。</b>
+              <span>天大的事，也等明天再说。长大以后才知道，这是最高级的自爱。</span>
+            </li>
+            <li>
+              <b>做人要有礼，吃点亏不要紧。</b>
+              <span>受了委屈可以讲，但不能失了体面。这话让我在很多次想失态的时候忍住了。</span>
+            </li>
+            <li>
+              <b>钱要省着花，该帮的人一定要帮。</b>
+              <span>你对自己很抠，对别人却从来大方。你的手比你的嘴，更早教会我什么叫慷慨。</span>
+            </li>
+            <li>
+              <b>别人夸你，笑一笑；别人说你坏话，走开就好。</b>
+              <span>你不争辩，也不记恨，把日子过得清清爽爽。</span>
+            </li>
+            <li>
+              <b>家永远是你的退路。</b>
+              <span>「外面不好就回来，家里永远有你一口饭。」这句话是我这辈子最大的底气。</span>
+            </li>
+          </ul>
+        </div>
+
+        <aside class="lessons-side">
+          <div class="card reveal">
+            <h3>🎙️ 妈妈语录</h3>
+            <ul class="quote-list">
+              <li>「多吃点，你太瘦了。」</li>
+              <li>「钱够不够花？妈给你转一点。」</li>
+              <li>「别熬夜，身体是你自己的。」</li>
+              <li>「我没事，你别惦记我。」</li>
+              <li>「妈不要你多有出息，妈只要你平安。」</li>
+              <li>「什么时候回来？妈给你做好吃的。」</li>
+            </ul>
+            <p class="card-note">这些话我听了二十年，从前觉得啰嗦，现在每听一次都想哭。</p>
+          </div>
+
+          <div class="card card-soft reveal">
+            <h3>💐 她其实要的很简单</h3>
+            <p>她不要很贵的礼物。一条你随手回的消息、一次你主动打的电话、一张你陪她拍的照片，就够她高兴好几天。</p>
+            <p class="card-note">今天，就今天，给她打个电话吧。</p>
+          </div>
+        </aside>
+      </div>
+    </section>
+
+    <!-- ============ 一封信 ============ -->
+    <section class="section" id="letter">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">A Letter</p>
+          <h2>一封信</h2>
+          <p class="section-sub">有些话当面说不出口，写下来就容易多了。</p>
+        </header>
+
+        <div class="letter-wrap reveal">
+          <article class="letter" id="letterPaper">
+            <div class="letter-tape" aria-hidden="true"></div>
+            <p class="letter-salutation" id="letterSalutation">亲爱的妈妈：</p>
+
+            <div class="letter-body" id="letterBody">
+              <!-- ✏️ 信件原文：想改内容直接改这里，JS 会逐字打出来 -->
+              <p>见字如面。</p>
+              <p>我很少认真地对你说谢谢。因为这两个字太轻了，装不下你为我做的那些事——那些凌晨起来熬的粥，那些塞进我书包的水果，那些你嘴上说「随便买的」、其实挑了很久的东西。</p>
+              <p>小时候我总觉得你很厉害，什么都不怕，什么都会。长大以后我才看懂：你不是天生坚强，你只是把害怕藏了起来，因为你要我安心。</p>
+              <p>对不起，我成长得太慢，明白得太晚。我曾经嫌你唠叨，嫌你土气，嫌你跟不上我的世界。可你从来没有因此少爱我一点。</p>
+              <p>现在我想告诉你：你一点都不土，你是这个世界上最体面的人。你用最朴素的方式，给了我最好的教养、最足的底气，和一个永远可以回去的家。</p>
+              <p>妈妈，你不必再为我省了，不必再硬撑了，也不必再假装什么都不需要。剩下的路，让我走在你前面一点，替你把门推开、把伞撑好。</p>
+              <p>愿你少一点操劳，多一点自己。愿你想买什么就买，想去哪儿就去。愿你被人温柔以待——就像你对待这个世界那样。</p>
+              <p class="letter-love">妈妈，我爱你。这句话，我是认真的。</p>
+            </div>
+
+            <div class="letter-actions">
+              <button class="btn btn-small btn-ghost" id="skipLetter" type="button">⏩ 一次性显示</button>
+              <button class="btn btn-small btn-ghost" id="replayLetter" type="button">✍️ 重新读一遍</button>
+            </div>
+
+            <p class="letter-sign" id="letterSign">爱你的孩子</p>
+          </article>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 夸夸妈妈 ============ -->
+    <section class="section section-alt" id="compliment">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">Say Something Nice</p>
+          <h2>夸夸妈妈</h2>
+          <p class="section-sub">点一下按钮，就有一句真心话送给她。想夸多少句都可以。</p>
+        </header>
+
+        <div class="compliment-box reveal">
+          <div class="compliment-card">
+            <p class="compliment-text" id="complimentText">准备好了吗？点下面的按钮，开始夸她 💗</p>
+          </div>
+
+          <div class="compliment-actions">
+            <button class="btn btn-primary" id="praiseBtn" type="button">🌸 再夸一句</button>
+            <button class="btn btn-ghost" id="flowerBtn" type="button">💐 送她一束花</button>
+          </div>
+
+          <div class="compliment-stats">
+            <p>你已经夸了她 <b id="praiseCount">0</b> 句，送了 <b id="flowerCount">0</b> 束花</p>
+            <p class="card-note">这些心意都存在你自己的浏览器里，不会上传到任何地方。</p>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 我的承诺 ============ -->
+    <section class="section" id="promises">
+      <div class="container">
+        <header class="section-head reveal">
+          <p class="eyebrow">My Promises</p>
+          <h2>我的承诺</h2>
+          <p class="section-sub">爱不该只是说说。做完一件，就勾掉一件——这是我和自己的约定。</p>
+        </header>
+
+        <div class="promise-box reveal">
+          <div class="promise-progress">
+            <div class="promise-bar"><i id="promiseBar" style="--w:0%"></i></div>
+            <p class="promise-label"><b id="promiseCount">0 / 8</b> 已完成</p>
+          </div>
+
+          <ul class="promise-list" id="promiseList">
+            <li><label><input type="checkbox" data-key="p1" /><span>每周至少给她打一次电话，好好说话，不敷衍</span></label></li>
+            <li><label><input type="checkbox" data-key="p2" /><span>记住她的生日，提前准备，而不是当天转账</span></label></li>
+            <li><label><input type="checkbox" data-key="p3" /><span>教她用手机的新功能时，像她当年教我那样有耐心</span></label></li>
+            <li><label><input type="checkbox" data-key="p4" /><span>带她去做一次全面体检，并且陪着去</span></label></li>
+            <li><label><input type="checkbox" data-key="p5" /><span>和她拍一张正式的合影，洗出来放进相框</span></label></li>
+            <li><label><input type="checkbox" data-key="p6" /><span>学会她最拿手的那道菜，做给她吃一次</span></label></li>
+            <li><label><input type="checkbox" data-key="p7" /><span>带她去看一次海，或者她一直想去的地方</span></label></li>
+            <li><label><input type="checkbox" data-key="p8" /><span>每年至少回家两次，不只是节假日</span></label></li>
+          </ul>
+
+          <button class="btn btn-small btn-ghost" id="resetPromises" type="button">清空勾选</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- ============ 结尾 ============ -->
+    <section class="love-band" id="love">
+      <div class="container love-inner reveal">
+        <p class="eyebrow">One Last Thing</p>
+        <h2 class="love-title">妈妈，我爱你</h2>
+        <p class="love-sub">
+          这句话不该只在节日说，不该只在朋友圈说，也不该只在你不在场的时候说。<br />
+          等我回家，我要当着你的面，认认真真地讲一遍。
+        </p>
+        <button class="btn btn-primary btn-big" id="loveBtn" type="button">💗 按下这里</button>
+        <p class="love-hint">（按下去，会有很多很多的爱落下来）</p>
+      </div>
+    </section>
+  </main>
+
+  <!-- ============ 页脚 ============ -->
+  <footer class="site-footer">
+    <div class="container footer-inner">
+      <div class="footer-brand">
+        <span class="logo-mark">💗</span>
+        <div>
+          <strong>写给我最爱的妈妈</strong>
+          <p>用 HTML、CSS 和 JavaScript 一点一点写出来的，就像你一点一点把我养大。</p>
+        </div>
+      </div>
+      <div class="footer-links">
+        <a href="#praises">她的好</a>
+        <a href="#gallery">时光相册</a>
+        <a href="#letter">一封信</a>
+        <a href="#promises">我的承诺</a>
+        <a href="#" id="resetAll">清空本地记录</a>
+      </div>
+    </div>
+    <div class="footer-bottom">
+      <span>© <span id="year">2025</span> 献给我的妈妈 · 仅作私人纪念</span>
+      <span>Made with 💗</span>
+    </div>
+  </footer>
+
+  <button class="to-top" id="toTop" type="button" aria-label="回到顶部">↑</button>
+
+  <!-- ============ 图片放大 ============ -->
+  <div class="lightbox" id="lightbox" role="dialog" aria-modal="true" aria-label="照片查看" hidden>
+    <button class="lightbox-close" id="lightboxClose" type="button" aria-label="关闭">×</button>
+    <div class="lightbox-content">
+      <div class="lightbox-art" id="lightboxArt">🖼️</div>
+      <p class="lightbox-caption" id="lightboxCaption"></p>
     </div>
   </div>
 
-  <script type="module" src="js/main.js"></script>
-</body>
+  <div class="toast" id="toast" role="status" aria-live="polite"></div>
 
+  <script src="js/main.js"></script>
+</body>
 </html>
